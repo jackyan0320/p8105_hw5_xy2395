@@ -12,7 +12,9 @@ library(tidyverse)
 
 # Problem 1
 
-```{r}
+## Data manipulation
+
+```{r, message = FALSE}
 data_p1 = 
   list.files("./data/problem_1") %>% 
   as.tibble() %>% 
@@ -37,7 +39,10 @@ data_p1 =
 head(data_p1)
 ```
 
+## Plot
+
 ```{r}
+# plot observations on each subject over time
 data_p1 %>% 
   group_by(arm, new_id) %>% 
   ggplot(aes(x = week, y = value, group = new_id, color = arm)) +
@@ -47,4 +52,52 @@ data_p1 %>%
   )
 ```
 
+Comment:
 Observations for the experimental group tended to increase over time, whereas observations for the control group did not show trend of increase over time.
+
+# Problem 2
+
+Describe the raw data.
+
+Create a city_state variable (e.g. “Baltimore, MD”) and then summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+
+```{r, message = FALSE}
+data_p2 = 
+  read_csv("./data/homicide-data.csv") %>% 
+  mutate(city_state = str_c(city, ", ", state),
+         disposition = as.factor(disposition))
+
+n_total = 
+  data_p2 %>% 
+  group_by(city_state) %>% 
+  count() %>% 
+  rename(n_total = n) 
+
+n_unsolved = 
+  data_p2 %>% 
+  group_by(city_state) %>% 
+  filter(disposition != "Closed by arrest") %>% 
+  count() %>% 
+  rename(n_unsolved = n) 
+
+full_join(n_total, n_unsolved) %>% filter(is.na(n_unsolved) == T)
+
+count_data = 
+  inner_join(n_total, n_unsolved) %>% 
+  ungroup()
+```
+
+For the city of Baltimore, MD:
+```{r}
+sample = 
+  homicide_count %>% 
+  filter(city_state == "Baltimore, MD")
+
+prop.test(sample$n_unsolved, sample$n_total) %>% 
+  broom::tidy() %>% 
+  select(estimate, conf.low, conf.high)
+```
+
+
+
+
