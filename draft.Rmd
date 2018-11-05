@@ -1,0 +1,43 @@
+---
+title: "Test"
+author: "Jack Yan"
+date: "11/2/2018"
+output: html_document
+---
+```{r}
+library(tidyverse)
+```
+
+
+
+
+```{r, include = FALSE}
+data_con = vector("list", length = 10)
+for (i in 1:10) {
+  data_con[[i]] = 
+  str_c("./data/con_", sprintf("%02d",i), ".csv") %>% 
+  read_csv() %>% 
+  mutate(arm = "con",
+         id = i)
+}
+
+data_exp = vector("list", length = 10)
+for (i in 1:10) {
+  data_exp[[i]] = 
+  str_c("./data/exp_", sprintf("%02d",i), ".csv") %>% 
+  read_csv() %>% 
+  mutate(arm = "exp",
+         id = i)
+}
+
+data_p1 = 
+  bind_rows(data_con, data_exp) %>% 
+  select(id, arm, everything()) %>% 
+  gather(key = week, value = value, week_1:week_8) %>% 
+  mutate(week = str_replace(week, "week_", ""),
+         arm = as.factor(arm),
+         week = as.factor(week)) 
+  
+```
+
+

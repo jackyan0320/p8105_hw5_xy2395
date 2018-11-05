@@ -63,7 +63,7 @@ Observations for the experimental group tended to increase over time, whereas ob
 data_p2 = read_csv("./data/homicide-data.csv")
 ```
 
-This dataset contains `r nrow(data_p2)` observations and `r ncol(data_p2)` variables. Observations denote cases of homicide over the past decade in 50 of the largest American cities. According to Washington Post, "the data included the location of the killing, whether an arrest was made and, in most cases, basic demographic information about each victim." As variable names clealy indicate, the data contain the data, victim names, race, age, sex, location and dispostion of each case. 
+This dataset contains `r nrow(data_p2)` observations and `r ncol(data_p2)` variables. Observations denote cases of homicide over the past decade in 50 of the largest American cities. According to Washington Post, "the data included the location of the killing, whether an arrest was made and, in most cases, basic demographic information about each victim." As variable names clealy indicate, the data contain date, victim names, race, age, sex, location and dispostion for each case. 
 
 ## Data Manipulation
 
@@ -88,15 +88,16 @@ n_unsolved =
   count() %>% 
   rename(n_unsolved = n) 
 
-# The city Tulsa, AL with no unsolved cases was filtered out for further analysis
+# The city Tulsa, AL with no unsolved cases will be excluded for further analysis
 full_join(n_total, n_unsolved) %>% filter(is.na(n_unsolved) == T)
 
+# join numbers of total cases and unsolved cases
 count_data = 
   inner_join(n_total, n_unsolved) %>% 
   ungroup()
 ```
 
-For the city of Baltimore, MD:
+For the city of Baltimore, MD, do the proportion test:
 
 ```{r}
 sample = 
@@ -108,7 +109,7 @@ prop.test(sample$n_unsolved, sample$n_total) %>%
   select(estimate, conf.low, conf.high)
 ```
 
-Function:
+Develop a function for further iteraion:
 
 ```{r}
 custom_prop_test = function(x_city){
@@ -123,7 +124,7 @@ custom_prop_test = function(x_city){
 }
 ```
 
-Iteration:
+Iteration among all the cities:
 
 ```{r }
 prop_data = 
