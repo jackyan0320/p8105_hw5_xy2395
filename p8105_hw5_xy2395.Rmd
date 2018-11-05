@@ -7,4 +7,44 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
+
+# Problem 1
+
+```{r}
+data_p1 = 
+  list.files("./data/problem_1") %>% 
+  as.tibble() %>% 
+  mutate(value = str_c("./data/problem_1/", value),
+         new_id = 1:20
+         )
+
+data_p1 = 
+  map(.x = data_p1$value, ~read_csv(.x)) %>%
+  mutate(data_p1, data = .) %>% 
+  unnest %>% 
+  mutate(value = str_replace(value, "./data/problem_1/", "")) %>% 
+  mutate(value = str_replace(value, ".csv", "")) %>% 
+  separate(value, into = c("arm", "id"), sep = "_") %>% 
+  gather(key = week, value = value, week_1:week_8) %>% 
+  mutate(week = str_replace(week, "week_", ""),
+         arm = as.factor(arm),
+         week = as.factor(week),
+         id = as.numeric(id) %>% as.factor()
+  )
+
+head(data_p1)
+```
+
+```{r}
+data_p1 %>% 
+  group_by(arm, new_id) %>% 
+  ggplot(aes(x = week, y = value, group = new_id, color = arm)) +
+  geom_line() +
+  labs(
+    title = "Observations on each subject over time"
+  )
+```
+
+
