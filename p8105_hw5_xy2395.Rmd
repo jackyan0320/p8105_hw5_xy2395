@@ -99,5 +99,17 @@ prop.test(sample$n_unsolved, sample$n_total) %>%
 ```
 
 
+```{r}
+custom_prop_test = function(x_city){
+  
+  sample = 
+    homicide_count %>% 
+    filter(city_state == x_city)
+
+  prop.test(sample$n_unsolved, sample$n_total) %>% 
+  broom::tidy() %>% 
+  select(estimate, conf.low, conf.high)
+}
+```
 
 
