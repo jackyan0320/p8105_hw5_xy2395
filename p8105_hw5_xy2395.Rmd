@@ -90,7 +90,7 @@ count_data =
 For the city of Baltimore, MD:
 ```{r}
 sample = 
-  homicide_count %>% 
+  count_data %>% 
   filter(city_state == "Baltimore, MD")
 
 prop.test(sample$n_unsolved, sample$n_total) %>% 
@@ -98,12 +98,13 @@ prop.test(sample$n_unsolved, sample$n_total) %>%
   select(estimate, conf.low, conf.high)
 ```
 
+Function:
 
 ```{r}
 custom_prop_test = function(x_city){
   
   sample = 
-    homicide_count %>% 
+    count_data %>% 
     filter(city_state == x_city)
 
   prop.test(sample$n_unsolved, sample$n_total) %>% 
@@ -112,4 +113,34 @@ custom_prop_test = function(x_city){
 }
 ```
 
+Iteration:
+
+```{r }
+prop_data = 
+  map(.x = count_data$city_state, ~custom_prop_test(.x)) %>% 
+  mutate(count_data, result = .) %>% 
+  unnest %>% 
+  select(city_state, estimate, conf.low, conf.high)
+
+prop_data
+```
+
+Plot:
+
+Create a plot that shows the estimates and CIs for each city – check out geom_errorbar for a way to add error bars based on the upper and lower limits. Organize cities according to the proportion of unsolved homicides.
+
+```{r}
+prop_data %>% 
+  mutate(city_state = fct_reorder(city_state, estimate)) %>% 
+  ggplot(aes(x = city_state, y = estimate, ymin = conf.low, ymax = conf.high)) +
+  geom_point() +
+  geom_errorbar() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = rel(0.8))) +
+  labs(
+    x = "City",
+    y = "Proportion",
+    title = "Proportion of unsolved cases: Estimates and CIs for each city"
+  )
+
+```
 
