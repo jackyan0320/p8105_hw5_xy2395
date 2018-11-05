@@ -47,4 +47,4 @@ data_p1 %>%
   )
 ```
 
-
+Observations for the experimental group tended to increase over time, whereas observations for the control group did not show trend of increase over time.
