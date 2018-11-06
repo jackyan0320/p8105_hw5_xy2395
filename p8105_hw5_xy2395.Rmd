@@ -61,12 +61,14 @@ data_p1 %>%
   group_by(arm, new_id) %>% 
   ggplot(aes(x = week, y = value, group = new_id, color = arm)) +
   geom_line() +
+  theme_bw() +
   labs(
     title = "Observations on each subject over time"
   )
 ```
 
 Comment:
+
 Observations for the experimental group tended to increase over time, whereas observations for the control group did not show trend of increase over time.
 
 # Problem 2
@@ -111,21 +113,24 @@ count_data =
   ungroup()
 ```
 
-For the city of Baltimore, MD, do the proportion test:
+## Proportion test for Baltimore, MD
 
 ```{r}
+# select Baltimore, MD only
 sample = 
   count_data %>% 
   filter(city_state == "Baltimore, MD")
 
+# do the proportion test and select results of interest from the tidy summary
 prop.test(sample$n_unsolved, sample$n_total) %>% 
   broom::tidy() %>% 
   select(estimate, conf.low, conf.high)
 ```
 
-Develop a function for further iteraion:
+## Develop a function for further iteraion
 
 ```{r}
+# use the name of each city as an argument
 custom_prop_test = function(x_city){
   
   sample = 
@@ -138,7 +143,7 @@ custom_prop_test = function(x_city){
 }
 ```
 
-Iteration among all the cities:
+## Iteration across all the cities
 
 ```{r }
 prop_data = 
@@ -150,7 +155,7 @@ prop_data =
 prop_data
 ```
 
-Plot:
+## Plot
 
 Create a plot that shows the estimates and CIs for each city – check out geom_errorbar for a way to add error bars based on the upper and lower limits. Organize cities according to the proportion of unsolved homicides.
 
@@ -158,14 +163,15 @@ Create a plot that shows the estimates and CIs for each city – check out geom_
 prop_data %>% 
   mutate(city_state = fct_reorder(city_state, estimate)) %>% 
   ggplot(aes(x = city_state, y = estimate, ymin = conf.low, ymax = conf.high)) +
-  geom_point() +
-  geom_errorbar() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = rel(0.8))) +
-  labs(
-    x = "City",
-    y = "Proportion",
-    title = "Proportion of unsolved cases: Estimates and CIs for each city"
-  )
+    geom_point() +
+    geom_errorbar() +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = rel(0.8))) +
+    labs(
+      x = "City",
+      y = "Proportion",
+      title = "Proportion of unsolved cases: Estimates and CIs for each city"
+    )
 
 ```
 
